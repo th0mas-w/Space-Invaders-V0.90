@@ -1,0 +1,54 @@
+function init(self)
+	msg.post(".", "acquire_input_focus")
+	self.speed = 300
+	self.move_distance = 0
+	running = true
+end
+
+	
+function update(self, dt)
+	local pos = go.get_position()
+	if running == true then
+		pos.z = 1
+		pos.x = pos.x + self.move_distance * dt
+		go.set_position(pos)
+		self.move_distance = 0
+		if math.random(score,200) == 200 then
+			factory.create("alien1#factory", vmath.vector3(math.random(40,925),650,1),nil,nil,0.2)
+		end
+		if math.random(score,500) == 500 then
+			factory.create("alien2#factory", vmath.vector3(math.random(40,925),650,1),nil,nil,0.1)
+		end
+		--if math.random(score,750) == 750 then
+		--	factory.create("alien3#factory", vmath.vector3(math.random(40,925),650,1),nil,nil,0.75)
+		--end
+	end
+	if math.random(0,50) == 50 then
+		factory.create("/stars#factory",vmath.vector3(math.random(30,930),math.random(120,600),0),nil,nil,0.02)
+	end
+end
+
+function on_message(self, message_id, message, sender)
+	if message_id == hash("collision_response") then
+		sound.play("#hit")
+		msg.post("text","hit")
+	end
+end
+
+function on_input(self, action_id, action)
+	local pos = go.get_position()
+	if action_id == hash("right") and pos.x < 925 then
+		self.move_distance = self.speed
+	elseif action_id == hash("left") and pos.x > 30 then
+		self.move_distance = -self.speed
+	elseif action_id == hash("shoot")  and action.pressed then
+		factory.create("/bullet#factory",vmath.vector3(pos.x,pos.y,0.9))
+	elseif action_id == hash("reset") and action.pressed then
+		sprite.play_flipbook("/earth#sprite", hash("normal"))
+		go.set_position(vmath.vector3(pos.x,pos.y,1))
+		msg.post("text", "reset")
+		running = true
+	elseif action_id == hash("pause") and action.pressed then
+		running = not running
+	end
+end

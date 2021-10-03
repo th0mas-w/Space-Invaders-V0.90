@@ -1,0 +1,12 @@
+function update(self, dt)
+	pos = go.get_position()
+	pos.x = pos.x + 700 * dt
+	go.set_position(pos)
+end
+
+function on_message(self, message_id, message, sender)
+	if message_id == hash("collision_response") then
+		sprite.play_flipbook("/earth#sprite", "Earth")
+		go.delete()
+	end
+end

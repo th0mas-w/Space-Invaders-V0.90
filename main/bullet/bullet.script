@@ -1,0 +1,21 @@
+function init(self)
+	if running == true then
+		sound.play("#sound")
+	end
+end
+
+function update(self, dt)
+	local pos = go.get_position()
+	pos.y = pos.y + 500 * dt
+	go.set_position(pos)
+	if pos.y > 650 or running == false then
+		go.delete()
+	end
+end
+
+function on_message(self, message_id, message, sender)
+	if message_id == hash("collision_response") then
+		msg.post("text", "score")
+		go.delete()
+	end
+end

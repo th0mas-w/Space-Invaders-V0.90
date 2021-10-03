@@ -1,0 +1,23 @@
+function init(self)
+	self.speed = math.random(100,300)
+end
+
+function update(self, dt)
+	local pos = go.get_position()
+	pos.y = pos.y - self.speed * dt
+	go.set_position(pos)
+	if pos.y < -20 or running == false then
+		go.delete()
+	end
+end
+
+function on_message(self, message_id, message, sender)
+	if message_id == hash("collision_response") and message.other_group == hash("bullet") then
+		sprite.play_flipbook("#sprite", "Explosion")
+		timer.delay(1, false, function()
+			go.delete()
+		end)
+	else
+		go.delete()
+	end
+end

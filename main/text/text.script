@@ -1,0 +1,46 @@
+function init(self)
+	score = 0
+	self.lives = 3
+	self.highScore = 0
+end
+
+local function finishFlipbook(self)
+	local pos = go.get_position("player")
+	go.set_position(vmath.vector3(pos.x,pos.y,2),"player")
+	sprite.play_flipbook("/player#sprite", "Player")
+end
+
+function on_message(self, message_id, message, sender)
+	if message_id == hash("score") then
+		score = score + 1
+	elseif message_id == hash("hit") then
+		self.lives = self.lives - 1
+	elseif message_id == hash("reset") then
+		score = 0
+		self.lives = 3
+		label.set_text("#over", "")
+		label.set_text("#endScore","")
+		sprite.play_flipbook("/fireworks#sprite", "blank")
+		sprite.play_flipbook("/fireworks#sprite1", "blank")
+		
+	end
+	if score > self.highScore then
+		self.highScore = score
+	end
+	if self.lives == 0 then
+		if running == true then
+			if self.highScore > score or self.highScore == 0 then
+				sprite.play_flipbook("/fireworks#sprite", "Fireworks")
+				sprite.play_flipbook("/fireworks#sprite1", "Fireworks")
+			end
+			factory.create("/planetKiller#factory", vmath.vector3(0,476,0.1),nil,nil,0.3)
+			sprite.play_flipbook("/player#sprite", "playerExplosion",finishFlipbook)
+		end
+		running = false
+		label.set_text("#score", "")
+		label.set_text("#over", "Game Over")
+		label.set_text("#endScore","Score:"..score.."\nHigh Score:"..self.highScore)
+	else
+		label.set_text("#score", "Score:"..score.."\nLives:"..self.lives)
+	end
+end

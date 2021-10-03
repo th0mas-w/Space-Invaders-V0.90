@@ -1,0 +1,31 @@
+function init(self)
+	self.speed = math.random(100,200)
+	self.health = 1
+end
+
+function update(self, dt)
+	local pos = go.get_position()
+	pos.y = pos.y - self.speed * dt
+	go.set_position(pos)
+	if pos.y < -20 or running == false then
+		go.delete()
+	end
+end
+
+function on_message(self, message_id, message, sender)
+	if message_id == hash("collision_response") and message.other_group == hash("player") then
+		go.delete()
+	elseif message_id == hash("collision_response") and self.health == 0 and message.other_group == hash("bullet") then
+		sprite.play_flipbook("#sprite", "Explosion")
+		msg.post("#collisionobject", "disable")
+		timer.delay(0.5, false, function()
+			go.delete()
+		end)
+	elseif message_id == hash("collision_response") and self.health == 0 then
+		go.delete()
+	else
+		self.health = 0
+	end
+end
+
+
