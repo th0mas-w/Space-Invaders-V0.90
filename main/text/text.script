@@ -1,7 +1,10 @@
 function init(self)
 	score = 0
 	self.lives = 3
-	self.highScore = 0
+	-- fuck lua file handling
+	local hScore = assert(io.open("highScore.txt", "r"))
+	self.highScore = tonumber(hScore:read("*all"))
+	hScore:close()
 end
 
 local function finishFlipbook(self)
@@ -26,10 +29,12 @@ function on_message(self, message_id, message, sender)
 	end
 	if score > self.highScore then
 		self.highScore = score
+		local hScore = assert(io.open("highScore.txt", "w"))
+		hScore:write(self.highScore)
 	end
 	if self.lives == 0 then
 		if running == true then
-			if self.highScore > score or self.highScore == 0 then
+			if self.highScore == score then
 				sprite.play_flipbook("/fireworks#sprite", "Fireworks")
 				sprite.play_flipbook("/fireworks#sprite1", "Fireworks")
 			end
